@@ -1,0 +1,14 @@
+{
+  "name": "ysjx",
+  "version": "1.0.0",
+  "description": "有手就行",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "zhanwei",
+  "license": "ISC"
+}
