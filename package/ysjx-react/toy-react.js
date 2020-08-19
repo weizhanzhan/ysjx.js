@@ -8,7 +8,7 @@ class ElementWrapper{
     if(name.match(/^on([\s\S]+)$/)){
       this.root.addEventListener(RegExp.$1.replace(/^[\s\S]/,c=>c.toLowerCase()),value)
     }else{
-      this.root.setAttribute(tagName,value)
+      this.root.setAttribute(name,value)
     }
     
   }
@@ -56,8 +56,16 @@ export class Component{
     this.render()[RENDER_TO_DOM](range)
   }
   rerender(){
-    this._range.deleteContents()
-    this[RENDER_TO_DOM](this._range)
+    let oldRange = this._range
+
+    let range = document.createRange()
+    range.setStart(oldRange.startContainer,oldRange.startOffset)
+    range.setEnd(oldRange.startContainer,oldRange.startOffset)
+    this[RENDER_TO_DOM](range)
+    
+    oldRange.setStart(range.endContainer,range.endOffset)
+    oldRange.deleteContents()
+   
   }
   setState(newState){
     if(this.state === null && typeof this.state !== 'object'){
@@ -87,7 +95,6 @@ export class Component{
 }
 
 export function createElement(type,attributes,...children){
-  console.log('type', type,children)
   let e ;
   if(typeof type === 'string'){
     e = new ElementWrapper(type)
@@ -96,7 +103,13 @@ export function createElement(type,attributes,...children){
   }
 
   for (const p in attributes) {
-    e.setAttribute(p,attributes[p])
+
+    if(p==='className'){
+      e.setAttribute('class',attributes[p])
+    }else{
+      e.setAttribute(p,attributes[p])
+
+    }
   }
 
   
@@ -105,6 +118,9 @@ export function createElement(type,attributes,...children){
 
       if(typeof child ==='string'){
         child = new TextWrapper(child)
+      }
+      if(child  === null){
+        continue
       }
   
       if((typeof child === 'object') && (child instanceof Array)){
@@ -125,6 +141,5 @@ export function render(component,parentElement){
   let range = document.createRange();
   range.setStart(parentElement,0)
   range.setEnd(parentElement,parentElement.childNodes.length)
-  console.log('range', range)
   component[RENDER_TO_DOM](range)
 }
